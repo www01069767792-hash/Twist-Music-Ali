@@ -26,25 +26,25 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             git zip unzip \
-            python3-pip \
+            python3-pip python3-venv \
             autoconf automake libtool \
             pkg-config zlib1g-dev \
             libncurses5-dev libncursesw5-dev \
             cmake libffi-dev libssl-dev
 
+      - name: Create Python environment
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip setuptools wheel
+
       - name: Install Buildozer
         run: |
-          python3 -m pip install --user --break-system-packages buildozer cython==0.29.36
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Extract project
-        run: |
-          unzip -o Twist_Music_Ali_Android_Project.zip
+          .venv/bin/python -m pip install buildozer cython==0.29.36
 
       - name: Build APK
         run: |
           cd Twist_Ali_Android
-          buildozer -v android debug
+          ../.venv/bin/buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
